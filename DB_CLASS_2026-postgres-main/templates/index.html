@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校園場地預約管理系統</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            background: #eef7fb;
+            color: #345b77;
+        }
+
+        /* 頂部導覽列 */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.96);
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            color: #356b98;
+            font-size: 21px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        nav a {
+            padding: 10px 24px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .login-btn {
+            background: white;
+            border: 1px solid #356b98;
+            color: #356b98;
+        }
+
+        .register-btn {
+            background: #58aaa7;
+            color: white;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        /* 主要內容 */
+        main {
+            max-width: 1100px;
+            margin: 65px auto;
+            padding: 0 24px;
+        }
+
+        .hero {
+            background: white;
+            border-radius: 18px;
+            padding: 95px 25px;
+            text-align: center;
+            box-shadow: 0 6px 25px rgba(40, 90, 130, 0.04);
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            color: #356b98;
+            margin: 0;
+        }
+
+        .hero p {
+            margin-top: 22px;
+            color: #7890a2;
+            font-size: 17px;
+            letter-spacing: 1px;
+        }
+
+        /* 功能卡片 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 55px 20px;
+            text-align: center;
+            box-shadow: 0 6px 25px rgba(40, 90, 130, 0.04);
+            transition: transform 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h2 {
+            font-size: 21px;
+            color: #356b98;
+            margin: 0;
+        }
+
+        @media (max-width: 700px) {
+            header {
+                padding: 18px 5%;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                font-size: 17px;
+            }
+
+            nav a {
+                padding: 8px 15px;
+            }
+
+            main {
+                margin-top: 35px;
+            }
+
+            .hero {
+                padding: 70px 20px;
+            }
+
+            .hero h1 {
+                font-size: 27px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            校園場地預約管理系統
+        </div>
+
+        <nav>
+            <a href="{{ url_for('api.login') }}"
+               class="login-btn">登入</a>
+
+            <a href="{{ url_for('api.register') }}"
+               class="register-btn">註冊</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="hero">
+            <h1>校園場地預約管理系統</h1>
+        </section>
+
+        <section class="features">
+
+            <div class="feature-card">
+                <h2>場地查詢</h2>
+            </div>
+
+            <div class="feature-card">
+                <h2>線上預約</h2>
+            </div>
+
+            <div class="feature-card">
+                <h2>預約管理</h2>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

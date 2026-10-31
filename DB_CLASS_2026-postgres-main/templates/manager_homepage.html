@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校園場館借用系統｜管理員後台</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f0f8fa;
+            color: #23445a;
+        }
+
+        header {
+            background: #124e73;
+            color: white;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { font-size: 22px; }
+
+        .logout {
+            color: white;
+            text-decoration: none;
+            border: 1px solid white;
+            border-radius: 6px;
+            padding: 8px 16px;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .welcome h2 { color: #124e73; }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 22px;
+            margin-top: 35px;
+        }
+
+        .card {
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            border-top: 5px solid #13a89e;
+            box-shadow: 0 5px 18px rgba(0,0,0,.06);
+        }
+
+        .card h3 { color: #124e73; }
+        .card p { color: #64748b; }
+
+        .coming-soon {
+            display: inline-block;
+            margin-top: 10px;
+            color: #0c8982;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>校園場館管理後台</h1>
+    <a class="logout" href="{{ url_for('api.logout') }}">登出</a>
+</header>
+
+<main>
+    <div class="welcome">
+        <h2>歡迎，管理員 {{ current_user.name }}！</h2>
+        <p>您可以在這裡管理場館、審核預約申請及查看使用紀錄。</p>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <h3>預約審核</h3>
+            <p>審核使用者提出的場地借用申請。</p>
+            <span class="coming-soon">功能開發中</span>
+        </div>
+
+        <div class="card">
+            <h3>場館管理</h3>
+            <p>管理場館資訊、設備與開放狀態。</p>
+            <span class="coming-soon">功能開發中</span>
+        </div>
+
+        <div class="card">
+            <h3>使用紀錄</h3>
+            <p>查看場館實際使用情況與回饋。</p>
+            <span class="coming-soon">功能開發中</span>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

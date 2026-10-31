@@ -1,0 +1,213 @@
+
+{% extends "base.html" %}
+
+{% block title %}校園場館借用系統｜會員登入{% endblock title %}
+
+{% block content %}
+
+<style>
+    .campus-login {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #eaf6fc, #e8f8f3);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 16px;
+    }
+
+    .login-card {
+        background: white;
+        width: 100%;
+        max-width: 430px;
+        padding: 40px;
+        border-radius: 18px;
+        box-shadow: 0 12px 35px rgba(20, 75, 100, 0.12);
+    }
+
+    .login-success {
+        background: #e8f8ef;
+        color: #167347;
+        border: 1px solid #a8dfbd;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .login-error {
+        background: #fff0f0;
+        color: #a12c2c;
+        border: 1px solid #f1b8b8;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .login-title {
+        text-align: center;
+        color: #176b9a;
+        font-size: 27px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .login-subtitle {
+        text-align: center;
+        color: #64748b;
+        margin-bottom: 30px;
+    }
+
+    .login-field {
+        margin-bottom: 22px;
+    }
+
+    .login-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #23445a;
+        font-weight: 600;
+    }
+
+    .login-field input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #cbdde5;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 15px;
+    }
+
+    .login-field input:focus {
+        outline: none;
+        border-color: #13a89e;
+        box-shadow: 0 0 0 3px rgba(19, 168, 158, 0.12);
+    }
+
+    .login-button {
+        width: 100%;
+        background: #13a89e;
+        color: white;
+        border: none;
+        padding: 13px;
+        border-radius: 9px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .login-button:hover {
+        background: #0c8982;
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 22px;
+        color: #64748b;
+    }
+
+    .login-footer a {
+        color: #176b9a;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+        .login-card {
+            padding: 28px 22px;
+        }
+
+        .login-title {
+            font-size: 23px;
+        }
+    }
+</style>
+
+<div class="campus-login">
+
+    <div class="login-card">
+
+        <h1 class="login-title">
+            校園場館借用系統
+        </h1>
+
+        <p class="login-subtitle">
+            歡迎回來，請登入您的帳號
+        </p>
+
+        <!-- 成功與錯誤訊息 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div
+                        class="{{ 'login-success' if category == 'success' else 'login-error' }}"
+                        role="alert"
+                    >
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- 登入表單 -->
+        <form method="POST" action="{{ url_for('api.login') }}">
+
+            <!-- UID -->
+            <div class="login-field">
+
+                <label for="uid">
+                    學號／員工編號
+                </label>
+
+                <input
+                    type="text"
+                    id="uid"
+                    name="uid"
+                    placeholder="請輸入學號或員工編號"
+                    maxlength="20"
+                    autocomplete="username"
+                    autocapitalize="characters"
+                    spellcheck="false"
+                    required
+                >
+
+            </div>
+
+            <!-- 密碼 -->
+            <div class="login-field">
+
+                <label for="password">
+                    密碼
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="請輸入密碼"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+            <button type="submit" class="login-button">
+                登入
+            </button>
+
+        </form>
+
+        <div class="login-footer">
+            還沒有帳號嗎？
+            <a href="{{ url_for('api.register') }}">
+                立即註冊
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock content %}
