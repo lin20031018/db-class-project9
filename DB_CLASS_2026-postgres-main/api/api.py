@@ -1,7 +1,13 @@
+from functools import wraps
+from pathlib import Path
+import hmac
+import secrets
+
+import click
 
 from flask import (
     render_template, Blueprint, redirect,
-    request, url_for, flash, abort
+    request, url_for, flash, abort, session
 )
 from flask_login import (
     LoginManager, UserMixin, login_user,
@@ -13,7 +19,7 @@ from werkzeug.security import (
 )
 from psycopg2.errors import UniqueViolation
 
-from api.sql import AppUser, Department
+from api.sql import AppUser, Department, RecordNotFound, RecordConflict, CampusAdmin
 
 
 # ==========================================
@@ -314,9 +320,7 @@ def admin_home():
     if current_user.role != 'manager':
         abort(403)
 
-    return render_template(
-        'manager_homepage.html'
-    )
+    return redirect(url_for('analysis.dashboard'))
 
 
 # ==========================================
@@ -332,3 +336,70 @@ def logout():
     return redirect(
         url_for('index')
     )
+
+
+def manager_required(view):
+    """管理員權限與資料層錯誤轉換，供後台各控制器共用。"""
+    @wraps(view)
+    @login_required
+    def wrapped(*args, **kwargs):
+        if current_user.role != 'manager':
+            abort(403)
+        try:
+            return view(*args, **kwargs)
+        except RecordNotFound:
+            abort(404)
+        except RecordConflict as exc:
+            abort(409, str(exc))
+    return wrapped
+
+
+# ==========================================
+# 管理者帳號與資料表初始化指令
+# ==========================================
+
+def register_commands(app):
+    @app.cli.command('init-reservations')
+    def init_reservations():
+        """Install campus users and reservation tables without touching bookstore data."""
+        CampusAdmin.initialize(sorted((Path(app.root_path) / 'migrations').glob('*.sql')))
+        click.echo('校園帳號與預約資料表已建立。')
+
+    @app.cli.command('create-manager')
+    @click.option('--uid', prompt='管理者編號')
+    @click.option('--name', prompt='姓名')
+    @click.option('--email', prompt='電子郵件')
+    @click.password_option(confirmation_prompt=True)
+    def create_manager(uid, name, email, password):
+        """Create a manager; existing accounts are never silently promoted or overwritten."""
+        uid, name, email = uid.strip().upper(), name.strip(), email.strip().lower()
+        if not uid or len(uid) > 20 or not name or len(name) > 128:
+            raise click.ClickException('編號需為 1–20 字，姓名需為 1–128 字。')
+        if '@' not in email or len(email) > 254 or len(password) < 12:
+            raise click.ClickException('請提供有效電子郵件及至少 12 字元的密碼。')
+        try:
+            CampusAdmin.create_manager(uid, name, email, generate_password_hash(password))
+        except ValueError as exc:
+            raise click.ClickException(str(exc))
+        click.echo('管理者帳號已建立，可從一般登入頁登入。')
+
+
+# ==========================================
+# 共用表單 CSRF 驗證
+# ==========================================
+
+def init_csrf(app):
+    def csrf_token():
+        if '_csrf_token' not in session:
+            session['_csrf_token'] = secrets.token_hex(32)
+        return session['_csrf_token']
+
+    app.jinja_env.globals['csrf_token'] = csrf_token
+
+    @app.before_request
+    def protect_forms():
+        if request.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+            expected = session.get('_csrf_token', '')
+            received = request.form.get('csrf_token', '')
+            if not expected or not hmac.compare_digest(expected.encode('utf-8'), received.encode('utf-8')):
+                abort(400, '表單驗證失效，請重新載入頁面後再試。')

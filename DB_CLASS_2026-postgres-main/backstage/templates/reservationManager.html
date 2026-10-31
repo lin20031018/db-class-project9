@@ -1,0 +1,15 @@
+{% extends 'backstage.html' %}
+{% block title %}預約管理{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>預約管理</h1><p class="muted">搜尋、管理與審核所有場館預約。</p></div><a class="button" href="{{ url_for('manager.reservation_form') }}">＋ 新增預約</a></div>
+<section class="panel">
+<form class="filters" method="get">
+<label>搜尋<input name="q" value="{{ filters.q }}" maxlength="128" placeholder="場地、姓名或帳號"></label>
+<label>預約狀態<select name="status"><option value="">全部狀態</option>{% for key,label in status_labels.items() %}<option value="{{ key }}" {{ 'selected' if filters.status==key }}>{{ label }}</option>{% endfor %}</select></label>
+<label>開始日期<input type="date" name="from" value="{{ filters['from'] }}"></label><label>結束日期<input type="date" name="to" value="{{ filters.to }}"></label>
+<button type="submit">篩選</button><a class="button secondary" href="{{ url_for('manager.reservation_list') }}">重設</a>
+</form><p class="muted">共 {{ total }} 筆預約 · 日期篩選依預約開始日</p>
+{% include '_reservationTable.html' %}
+<div class="pagination">{% if page > 1 %}<a href="{{ links[page-1] }}">← 上一頁</a>{% endif %}<span class="muted">{{ page }} / {{ pages }} 頁</span>{% if page < pages %}<a href="{{ links[page+1] }}">下一頁 →</a>{% endif %}</div>
+</section>
+{% endblock %}

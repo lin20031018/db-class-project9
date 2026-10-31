@@ -160,6 +160,7 @@
 
         <!-- 註冊表單 -->
         <form method="POST" action="{{ url_for('api.register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <!-- 學號／員工編號 -->
             <div class="register-field">

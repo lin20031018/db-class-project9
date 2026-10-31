@@ -1,189 +1,21 @@
-{% extends "backstage.html" %}
-{% block head %}
-{{ super() }}
-{% endblock head %}
-{% block title %}後台資料分析{% endblock title%}
+{% extends 'backstage.html' %}
+{% block title %}預約儀表板{% endblock %}
 {% block content %}
-
-<div class="my-3 p-3 bg-body rounded shadow-sm">
-  <!-- Dashboard -->
-  <div id="dashboard">
-    <nav>
-      <div class="nav nav-tabs" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">訂單數量分析</button>
-        <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">書本銷量分類</button>
-        <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">消費總額排名</button>        
-      </div>      
-    </nav>
-  </div>
-  <br/>
-  <div class="tab-content" id="nav-tabContent">
-    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-      <center> 
-        <div id="maina" class="container-fluid" style="width:1200px;height:500px"></div>
-      </center>
-    </div>
-    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-      <center>
-        <div id="mainb" class="container-fluid" style="width: 600px;height:500px"></div>
-      </center>
-    </div>
-    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
-      <center>
-        <div id="mainc" class="container-fluid" style="width: 1200px;height:500px"></div>
-      </center>
-    </div>
-  </div>
+<div class="page-heading"><div><h1>預約儀表板</h1><p class="muted">歡迎，管理員 {{ current_user.name }}！您可以在這裡查看場館使用情況與審核預約申請。</p></div><a class="button" href="{{ url_for('manager.reservation_form') }}">＋ 新增預約</a></div>
+<div class="stats">
+<div class="stat"><span>預約總數</span><strong>{{ summary.total }}</strong><small>全部未刪除的預約</small></div>
+<a class="stat highlight" href="{{ url_for('manager.reservation_list', status='pending') }}"><span>待審核申請 ↗</span><strong>{{ summary.pending }}</strong><small>等待管理者處理</small></a>
+<div class="stat"><span>已核准預約</span><strong>{{ summary.approved }}</strong><small>累計核准 {{ '%.1f'|format(summary.hours) }} 小時</small></div>
+<div class="stat"><span>今日場館預約</span><strong>{{ summary.today }}</strong><small>今日使用的已核准預約</small></div>
 </div>
-
-<script>
-  // 以長條圖與折線圖分析各月訂單
-  var chartDoma = document.getElementById('maina');
-  var myCharta = echarts.init(chartDoma);
-  var data = {{revenue|tojson}};
-  var count = {{dataa|tojson}};
-  var optiona = {
-    title: {
-      text: '各月訂單數量分析'
-    },
-    tooltip: {},
-    legend: {
-      data: ['訂單數量']
-    },
-    xAxis: {
-      data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-    },
-    yAxis: {},
-    series: [{
-      name: '銷售總額',
-      type: 'bar',
-      // symbol: 'circle',
-      symbolSize: 16,
-      data: data,
-      markPoint: {
-        data: [
-          {type: 'max', name: '銷量最高月份'},
-          {type: 'min', name: '銷量最低月份'}
-        ]
-      },
-      label: {
-        show: true,
-        position: 'top',
-        textStyle: {
-          fontSize: 15
-        }
-      }
-    }
-    ],
-    legend: {
-      show: true
-    },
-  };
-
-  // 以圓餅圖分析書本銷量
-  var chartDomb = document.getElementById('mainb');
-  var myChartb = echarts.init(chartDomb);
-  var data = {{datab|tojson}};
-  var optionb = {
-    title: {
-      text: '各類商品銷量分析',
-      left: 'center',
-      top: 'center'
-    },
-    tooltip: {},
-    legend: {
-      orient: 'vertical',
-      x: 'left',
-      data: ['BOOK', 'CD', 'DVD']
-    },
-    series: [
-      {
-        type: 'pie',
-        data: data,          
-        radius: ['40%', '70%']
-      }
-    ]
-  };
-
-  // 使用動態長條圖查看消費總額最多的使用者
-  var chartDomc = document.getElementById('mainc');
-  var myChartc = echarts.init(chartDomc);
-  var data = {{datac|tojson}};
-  var nameList = {{nameList|tojson}};
-  // var counter = {{counter|tojson}};
-  var countList = {{countList|tojson}};
-  var optionc = {
-    title: {
-      text: '使用者消費排名'
-    },
-    xAxis: {
-      max: 'dataMax'
-    },
-    yAxis: {
-      type: 'category',
-      data: nameList,
-      inverse: true,
-      animationDuration: 300,
-      animationDurationUpdate: 300,
-      max: 3
-    },
-    tooltip: {},
-    series: [
-      {
-        realtimeSort: true,
-        name: '消費總額',
-        type: 'bar',
-        data: data,
-        label: {
-          show: true,
-          position: 'right',
-          valueAnimation: true
-        }
-      },
-      {
-        realtimeSort: true,
-        name: '訂單總數',
-        type: 'bar',
-        data: countList,
-        label: {
-          show: true,
-          position: 'right',
-          valueAnimation: true
-        }
-      }
-      ],
-    legend: {
-      show: true
-    },
-    animationDuration: 3000,
-    animationDurationUpdate: 3000,
-    animationEasing: 'linear',
-    animationEasingUpdate: 'linear'
-  };
-
-  function run() {
-    myChartc.setOption({
-      series: [
-        {
-          type: 'bar',
-          data
-        }
-      ]
-    });
-  }
-
-  setTimeout(function() {
-    run();
-  }, 0);
-        
-  setInterval(function() {
-    update();
-  }, 3000);
-
-  optiona && myCharta.setOption(optiona);
-  optionb && myChartb.setOption(optionb);
-  optionc && myChartc.setOption(optionc);
-      
-</script>
-
-{% endblock content %}
+<section class="panel"><div class="panel-heading"><h2>實際使用概況</h2><span class="muted">依到場與離開紀錄統計</span></div><div class="usage-stats"><div><span class="muted">使用紀錄</span><h2>{{ usage_stats.total }} 筆</h2></div><div><span class="muted">使用中</span><h2>{{ usage_stats.active }} 筆</h2></div><div><span class="muted">已完成使用</span><h2>{{ usage_stats.completed }} 筆</h2></div><div><span class="muted">使用回饋</span><h2>{{ usage_stats.feedback }} 筆</h2></div></div></section>
+<div class="charts">
+<section class="panel"><h2>近六個月預約趨勢</h2><p class="muted subtitle">依預約開始月份統計 · 所有狀態</p><div class="chart" role="img" aria-label="近六個月預約筆數，依月份列示">
+{% for row in monthly %}<div class="chart-column"><div class="chart-track"><div class="chart-bar" style="height:{{ row.total / month_max * 90 }}%"><span>{{ row.total }}</span></div></div><small>{{ row.month }}</small></div>{% endfor %}
+</div></section>
+<section class="panel"><h2>熱門場地</h2><p class="muted subtitle">累計預約筆數 · 前六名</p>{% for row in venues %}<div class="venue-row"><div><span>{{ row.venue }}</span><strong>{{ row.total }} 筆</strong></div><div class="track"><span style="width:{{ row.total / venue_max * 100 }}%"></span></div></div>{% else %}<p class="empty">尚無預約資料，新增第一筆預約開始分析。</p>{% endfor %}</section>
+</div>
+<section class="panel"><div class="panel-heading"><div><h2>待處理申請</h2><span class="muted">最早送出的五筆申請 · 已駁回累計 {{ summary.rejected }} 筆 · 已取消 {{ summary.cancelled }} 筆</span></div><a href="{{ url_for('manager.reservation_list',status='pending') }}">查看全部 →</a></div>
+{% set rows = pending %}{% include '_reservationTable.html' %}
+</section>
+{% endblock %}

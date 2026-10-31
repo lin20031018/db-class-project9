@@ -1,0 +1,10 @@
+{% extends 'backstage.html' %}{% block title %}{{ '修改' if venue else '新增' }}場地{% endblock %}{% block content %}
+<div class="page-heading"><div><h1>{{ '修改' if venue else '新增' }}場地</h1></div><a href="{{ url_for('manager.venue_list') }}">← 返回場地列表</a></div>
+<section class="panel">{% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="form-grid">
+<label>場地名稱<input name="venue_name" value="{{ form.get('venue_name','') }}" maxlength="128" required></label>
+<label>場地類型<input name="venue_type" value="{{ form.get('venue_type','') }}" maxlength="80" placeholder="例如：教室、討論室" required></label>
+<label>容納人數上限<input type="number" name="capacity" min="1" max="100000" value="{{ form.get('capacity',1) }}" required></label>
+<label>開放狀態<select name="status">{% for key,label in [('open','開放預約'),('closed','暫停開放'),('maintenance','維修中')] %}<option value="{{ key }}" {{ 'selected' if form.get('status')==key }}>{{ label }}</option>{% endfor %}</select></label>
+<label class="full">注意事項與說明<textarea name="description" maxlength="2000">{{ form.get('description','') }}</textarea></label>
+<label class="full">配置器材<textarea name="equipment" rows="5" placeholder="投影機 | 正常 | 1&#10;麥克風 | 維修中 | 2">{{ form.get('equipment',equipment_text) }}</textarea><span class="muted">每行一種器材，依序填寫「器材名稱 | 狀態 | 數量」，留空表示無器材。修改後以本表單取代原配置。</span></label>
+</div><div class="actions"><button>儲存場地</button><a class="button secondary" href="{{ url_for('manager.venue_list') }}">取消</a></div></form></section>{% endblock %}

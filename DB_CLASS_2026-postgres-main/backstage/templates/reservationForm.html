@@ -1,0 +1,16 @@
+{% extends 'backstage.html' %}
+{% block title %}{{ '修改' if record else '新增' }}預約{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>{{ '修改' if record else '新增' }}預約</h1><p class="muted">{{ '僅可修改尚未審核的申請；每筆預約只審核一次。' if record else '替申請人建立場地借用申請，儲存後進入待審核。' }}</p></div><a href="{{ url_for('manager.reservation_list') }}">← 返回列表</a></div>
+<section class="panel">
+{% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% if record %}<input type="hidden" name="version" value="{{ form.get('version', record.version) }}">{% endif %}
+<div class="form-grid">
+<label>申請人<select name="applicant_uid" required><option value="">請選擇申請人</option>{% for user in users %}<option value="{{ user.uid }}" {{ 'selected' if form.get('applicant_uid')==user.uid }}>{{ user.user_name }}（{{ user.uid }}）</option>{% endfor %}</select></label>
+<label>預約場地<select name="venue_id" required><option value="">請選擇開放場地</option>{% for venue in venues %}<option value="{{ venue.vid }}" {{ 'selected' if form.get('venue_id','')|string == venue.vid|string }}>{{ venue.venue_name }} · {{ venue.venue_type }} · 上限 {{ venue.capacity }} 人</option>{% endfor %}</select><span class="muted">沒有場地？請先到「場地與器材」新增。</span></label>
+{% for key,label in [('starts_at','開始時間'),('ends_at','結束時間')] %}{% set value = form.get(key,'') %}<label>{{ label }}（台北時間）<input type="datetime-local" name="{{ key }}" value="{{ value.strftime('%Y-%m-%dT%H:%M') if value and value is not string else value }}" required></label>{% endfor %}
+<label>預計人數<input type="number" name="attendees" min="1" max="100000" value="{{ form.get('attendees',1) }}" required></label>
+<label class="full">借用用途<textarea name="purpose" maxlength="1000" required placeholder="請填寫活動內容與場地使用目的">{{ form.get('purpose','') }}</textarea></label>
+</div><div class="actions"><button type="submit">儲存預約</button><a class="button secondary" href="{{ url_for('manager.reservation_detail',reservation_id=record.id) if record else url_for('manager.reservation_list') }}">取消</a></div>
+</form></section>
+{% endblock %}

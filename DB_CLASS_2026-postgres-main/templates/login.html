@@ -153,6 +153,7 @@
 
         <!-- 登入表單 -->
         <form method="POST" action="{{ url_for('api.login') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <!-- UID -->
             <div class="login-field">

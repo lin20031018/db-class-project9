@@ -1,0 +1,4 @@
+<div class="table-wrap"><table><thead><tr><th>預約編號／場地</th><th>申請人</th><th>使用時段（台北時間）</th><th>狀態</th><th>操作</th></tr></thead><tbody>
+{% for row in rows %}<tr><td><strong>{{ row.venue }}</strong><br><span class="muted">#{{ '%05d'|format(row.id) }}</span></td><td>{{ row.user_name }}<br><span class="muted">{{ row.applicant_uid }}</span></td><td>{{ row.starts_at.strftime('%Y/%m/%d %H:%M') }}<br><span class="muted">至 {{ row.ends_at.strftime('%Y/%m/%d %H:%M') }}</span></td><td><span class="status {{ row.status }}">{{ status_labels[row.status] }}</span></td><td><a href="{{ url_for('manager.reservation_detail', reservation_id=row.id) }}">查看{% if row.status == 'pending' %}／審核{% endif %} →</a></td></tr>
+{% else %}<tr><td colspan="5" class="empty">目前沒有符合條件的預約。您可以調整篩選條件或新增預約。</td></tr>{% endfor %}
+</tbody></table></div>
